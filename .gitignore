@@ -1,0 +1,42 @@
+# --- Python Internals ---
+__pycache__/
+*.py[cod]
+*$py.class
+
+# --- Virtual Environment ---
+# (I see you have .venv, good job on at least ONE thing)
+.venv/
+venv/
+env/
+
+# --- Logs ---
+_logs/
+*.log
+
+# --- IDE / Editor Settings ---
+.vscode/
+.idea/
+
+# --- Backups & clutter ---
+# Seriously Izen, clean these up manually later!
+*.bak
+*.tmp
+*copy.py*
+*.swp
+
+# --- Output Media ---
+# Don't commit 4GB video files, you baka!
+*.mp4
+*.mkv
+*.webm
+*.avi
+*.mov
+*.mp3
+*.wav
+*.m4a
+*.opus
+*.flac
+
+# --- yt-dlp / ffmpeg temps ---
+*.part
+*.ytdl
