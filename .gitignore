@@ -40,3 +40,4 @@ _logs/
 # --- yt-dlp / ffmpeg temps ---
 *.part
 *.ytdl
+_garbage_backups/
