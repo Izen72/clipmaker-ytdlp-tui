@@ -9,184 +9,162 @@ Back to README: **[README.md](README.md)**
 ## 1) “It says *n challenge solving failed* / EJS / Some formats may be missing”
 
 ### Symptoms
-- yt-dlp prints something like:
+- Logs show something like:
   - `n challenge solving failed`
   - “Some formats may be missing”
   - References EJS / JS runtimes being unavailable
 
 ### What it means
-yt-dlp sometimes needs a working JavaScript runtime to solve YouTube challenges and unlock formats.
+The internal `yt-dlp` library sometimes needs a working JavaScript runtime to solve YouTube challenges and unlock specific high-quality formats.
 
 ### Fix
-Install **Node.js** and make sure it’s on PATH.
+Install **Node.js** and make sure it’s on your system PATH.
 
-Quick check:
-
+Quick check in a terminal:
 ```bash
 node -v
+
 ```
 
-If that works, re-run ClipMaker (or your manual yt-dlp command).
+If that works, re-run ClipMaker.
 
-If you can’t or don’t want Node installed, you may still be able to download *something*, but you might lose higher-quality formats.
+*If you can’t or don’t want Node installed, you may still be able to download something, but you might lose access to certain resolutions.*
 
 ---
 
 ## 2) Auth / bot wall / cookies required (403/429, “sign in”, captcha, etc.)
 
 ### Symptoms
-- yt-dlp errors include terms like:
-  - sign in / login
-  - “confirm you’re not a bot”
-  - captcha
-  - HTTP 403 / 429
-  - “cookies” / “age-restricted” / “members-only”
+
+* Errors include terms like:
+* sign in / login
+* “confirm you’re not a bot”
+* captcha
+* HTTP 403 / 429
+* “cookies” / “age-restricted” / “members-only”
+
+
 
 ### What ClipMaker does automatically
-ClipMaker always tries:
-1) **No cookies**
-2) If that looks like an auth/bot-wall failure → **auto cookie fallback**:
-   - **Zen** (Firefox-based)
-   - **Firefox**
-   - **Chromium-family** browsers (Chromium/Chrome/Brave/Edge/Vivaldi/Opera/Whale/Safari where relevant)
 
-### Manual confidence test (recommended)
-If you want to test whether Zen cookies are usable *outside* the app, run a quick probe:
+ClipMaker attempts to solve this in stages:
+
+1. **No cookies** (try anonymously first).
+2. If blocked, **Auto-Cookie Fallback**:
+* **Zen Browser** (Native support!)
+* **Firefox**
+* **Chromium-family** (Chrome/Edge/Brave/Vivaldi/Opera/Safari etc.)
+
+
+
+### Manual confidence test
+
+If you want to verify your browser cookies work *outside* the app, run a quick probe using the installed library or a manual yt-dlp binary if you have one:
 
 ```bash
-yt-dlp -v \
-  --cookies-from-browser firefox:"$HOME/.zen" \
-  --no-playlist \
-  --skip-download --print title \
-  "https://www.youtube.com/watch?v=VIDEO_ID"
+# Example probing Firefox
+yt-dlp -v --cookies-from-browser firefox --print title "[https://www.youtube.com/watch?v=VIDEO_ID](https://www.youtube.com/watch?v=VIDEO_ID)"
+
 ```
 
-If you see something like:
-- `Found YouTube account cookies`
-- and it prints the title successfully
-
-…then the cookie extraction path is working, and ClipMaker’s fallback has a good chance of working too.
-
-### Why `"$HOME/.zen"` is nicer than `"$HOME/.zen/<profile>.Default (release)"`
-That `<profile>` bit (e.g., `oplhmacu`) can be per-install / per-user / per-machine. Using the **root** directory lets yt-dlp locate the right profile without you hardcoding that random prefix.
-
 ### If you still get blocked
-- Try a different browser profile where you’re definitely logged in.
-- Make sure the browser is **closed** when you run cookie extraction (some systems lock DBs aggressively).
-- If you’re getting rate-limited (429), wait a while or change IP.
+
+* Try a different browser profile where you are definitely logged in.
+* **Close the browser** before running the tool (browsers lock their cookie databases, though ClipMaker tries to copy them to bypass this).
+* If you are rate-limited (429), wait a while or change your IP (VPN/Mobile Data).
 
 ---
 
 ## 3) “Audio downloaded as a .webm video with a black screen”
 
 ### Why it happens
-Some sites (YouTube included) commonly deliver audio streams in a container like **WebM** (often with Opus audio).  
-Many players display that as “a video” (because the container is often associated with video), even when it’s audio-only — hence the “black screen”.
 
-### What ClipMaker does
-Audio-only mode tries to prefer *audio-ish* containers when they exist (e.g., `.m4a` / AAC), without re-encoding.  
-If the site only offers WebM audio, yt-dlp may still deliver WebM — and that’s still valid audio.
+Some sites (YouTube included) deliver high-quality audio streams in a **WebM** container (Opus audio).
 
-### If you need a different extension/container
-You can remux *without re-encoding* (fast, no quality loss). Example: WebM/Opus → Ogg/Opus:
+Many video players identify this as "Video" because of the container, displaying a black screen during playback.
 
+### The Fix
+
+This is usually fine (the audio is valid). However, if you strictly need an audio file:
+
+* Use **Audio Mode** in ClipMaker.
+* It tries to find native audio containers (like `.m4a` / AAC).
+* If only WebM/Opus exists, you can manually remux it later:
 ```bash
-ffmpeg -i input.webm -c copy output.ogg
+ffmpeg -i input.webm -vn -c:a copy output.ogg
+
 ```
 
-Or WebM/Opus → Opus-in-Ogg explicitly:
 
-```bash
-ffmpeg -i input.webm -vn -c:a copy output.opus
-```
-
-(Exact best target depends on your editor/player.)
 
 ---
 
-## 4) “I picked MP4 but it still produced MKV / or it transcoded”
+## 4) “I picked MP4 but it says 'Remuxing' instead of downloading directly?”
 
 ### Why it happens
-Not all sources provide MP4-friendly codecs (H.264 video + AAC audio) in a way yt-dlp can download directly.  
-When direct MP4 isn’t viable, ClipMaker automatically falls back to:
-- **MKV download** (the “always works” path)
-- then **transcode** to MP4 (H.264 + AAC)
 
-### What to expect
-- Direct MP4 is the fastest path when available.
-- Fallback transcode costs time/CPU, but is reliable and yields MP4 compatibility.
+Modern streaming sites prioritize efficient codecs (AV1, VP9) which usually come in MKV/WebM containers. They often *do not* provide a high-quality H.264/MP4 stream directly.
+
+### Old behavior vs New behavior
+
+* **Old way (Transcoding):** Downloaded MKV -> Slowly re-encoded video to H.264. High CPU usage, quality loss.
+* **New way (Remuxing):** Downloads the **best** source (AV1/VP9) -> Copies the video stream into an MP4 container.
+* **Speed:** Instant.
+* **Quality:** Lossless (original source quality).
+* **Compatibility:** Audio is converted to AAC to ensure the MP4 plays on Apple devices/QuickTime.
+
+
+
+*If you strictly need legacy H.264 (for very old hardware), select **Method: Direct**. If that fails, ClipMaker will still fall back to Remuxing to ensure you at least get a file.*
 
 ---
 
-## 5) “My time range isn’t accepted” (or downloads the wrong thing)
+## 5) “My time range isn’t accepted”
 
 ### Accepted formats
-Start/end supports:
-- `SS` / `MM:SS` / `HH:MM:SS` (optional `.ms`)
-- End can be `inf`
-- Negative values are relative to the end (e.g., `-30`)
+
+* `SS` / `MM:SS` / `HH:MM:SS` (optional `.ms`)
+* End can be `inf` (end of video)
+* Negative values (e.g. `-30`) count back from the end.
 
 ### Common gotchas
-- **Start and end identical** → rejected
-- `Start=0` & `End=0` is a special “full video” shortcut **only when fragment count is 1**
-- For long VODs, prefer **H:MM:SS** to stay sane
+
+* **Identical Start/End** → Rejected.
+* **Start=0 / End=0** → Only allowed if Fragment Count is **1** (downloads full video).
 
 ---
 
-## 6) “The theme resets when I reopen the app”
+## 6) “Where is my theme saved?”
 
-### What’s going on
-Picking a theme at runtime (Ctrl+T / Command Palette) changes the theme *for that session*, but ClipMaker won’t remember it unless you set it programmatically.
+ClipMaker automatically saves your last used theme (selected via `Ctrl+T` or `Ctrl+P`) to a configuration file.
 
-### Fix (set a default theme in code)
-In `YtFragsApp.on_mount`, set `self.theme`:
+**Locations:**
 
-```python
-class YtFragsApp(App):
-    def on_mount(self) -> None:
-        self.theme = "tokyo-night"
-        self.push_screen(WizardScreen())
-```
+* **Windows**: `%APPDATA%\ytfrags\settings.json`
+* **macOS**: `~/Library/Application Support/ytfrags/settings.json`
+* **Linux**: `~/.config/ytfrags/settings.json`
 
-That forces the app to start in that theme every run.
-
-If you want true persistence (remember the last selected theme), you’d store it in a config file and reload it on startup — but “set a default” is the simple win.
+If settings aren't persisting, check permissions on that folder.
 
 ---
 
-## 7) “Do the in-app logs look sane?”
+## 7) “It says ffmpeg not found”
 
-### Short answer
-Yes — the log design is intentional.
+### The Fix
 
-### How it’s structured
-- **Activity** shows important, human-scannable events:
-  - destinations, warnings/errors, key yt-dlp stages, ffmpeg stages
-- **Details** (press **D**) is for raw-ish output when you need to diagnose:
-  - format selection, headers, ffmpeg progress lines, etc.
-- Everything is always written to `./_logs/ytfrags_*.log`
+**FFmpeg is mandatory** for cutting and remuxing.
 
-### Tip
-If you’re debugging auth or format weirdness, use **Details** + open the saved log file for the full context.
+* **Windows**: `winget install ffmpeg` (or add to PATH manually).
+* **macOS**: `brew install ffmpeg`
+* **Linux**: `sudo apt install ffmpeg`
 
----
+ClipMaker will refuse to start downloads if `ffmpeg` is not detected on your system PATH.
 
-## 8) “It says yt-dlp or ffmpeg not found”
-
-### Fix
-- Ensure `yt-dlp` is installed and on PATH:
-  ```bash
-  yt-dlp --version
-  ```
-- Ensure `ffmpeg` is installed and on PATH:
-  ```bash
-  ffmpeg -version
-  ```
-
-ClipMaker will refuse to start downloads if either is missing (by design).
+*(Note: You do NOT need to install `yt-dlp` manually; ClipMaker uses its own internal Python library version.)*
 
 ---
 
 ## Still stuck?
 
-If the failure is site-specific, grab the exact command shown in **Review**, run it in a terminal with `-v`, and attach the relevant `_logs/ytfrags_*.log` snippet when you ask for help.
+If the failure is site-specific, press **D** (Details) during the download to see the raw logs, or check the full log file saved in:
+`./_logs/ytfrags_YYYY-MM-DD_HHMMSS.log`
