@@ -38,41 +38,53 @@ If you’ve ever needed “only the 00:42:10–00:43:37 moment” from a VOD (an
 - **yt-dlp** is installed automatically as a Python library (via `requirements.txt`). You do **not** need to install the `yt-dlp` binary on your system path.
 
 ### System Tools
+- **uv** (must be on PATH). Used for high-speed dependency installation and virtual environment management.
+  - **Windows**: `winget install --id=astral-sh.uv -e`
+  - **macOS**: `brew install uv`
+  - **Linux**: Use your package manager ('sudo pacman -S uv' for Arch) or `curl -LsSf https://astral.sh/uv/install.sh | sh`
+  *(Note: You may need to restart your terminal after installing uv)*
+  
 - **ffmpeg** (must be on PATH). Used for high-speed cutting and remuxing.
   > *Portable install? You can point to it directly with `--ffmpeg-path "C:\path\to\ffmpeg.exe"` / `--ffmpeg-path "/path/to/ffmpeg"`.*
 
 ### Optional (highly recommended for YouTube)
 - **Node.js** on PATH  
   YouTube sometimes triggers an “n challenge” / EJS warning; having a JS runtime helps the internal library unlock formats.
-
 ---
 
 ## Install
 
 This project uses **uv** for fast, reproducible installs.
 
+**1. Clone the repo and create a virtual environment**
 ```bash
 git clone https://github.com/Izen72/clipmaker-ytdlp-tui.git
 cd clipmaker-ytdlp-tui
-
 uv venv
-
-# Activate the environment:
-# Windows:
-#   .venv\Scripts\activate
-# Linux/macOS:
-#   source .venv/bin/activate
-
-uv pip install --upgrade pip wheel setuptools uvloop
+```
+**2. Activate the environment:**
+### Windows:
+```bash
+.venv\Scripts\activate
+```
+### Linux/macOS:
+```bash
+source .venv/bin/activate
+```
+### Linux with the Fish shell (if Saba is a fish; a *certified* feesh 🐟✨):
+```bash
+source .venv/bin/activate.fish
+```
+**3. Install dependencies**
+```bash
 uv pip install -r requirements.txt
-
 ```
 
 **Install FFmpeg:**
 
 * **Windows**: `winget install ffmpeg` (or download binaries and add to PATH)
 * **macOS**: `brew install ffmpeg`
-* **Linux**: `sudo apt install ffmpeg` (or `dnf`, `pacman`, etc.)
+* **Linux**: `sudo pacman -S ffmpeg` (or `dnf`, `apt`, etc.)
 
 ---
 
@@ -170,12 +182,12 @@ If anything acts up (auth, missing formats, audio container weirdness, theme res
 ## Notes on quality
 
 * **Audio-only mode**:
-* Prioritizes **Opus** (the "AV1 of Audio") for maximum quality/size efficiency.
-* If the source is WebM/Opus, it automatically **remuxes** it to a clean `.opus` file (lossless copy).
-* Falls back to high-bitrate AAC (`.m4a`) if Opus is unavailable.
+  * Prioritizes **Opus** (the "AV1 of Audio") for maximum quality/size efficiency.
+  * If the source is WebM/Opus, it automatically **remuxes** it to a clean `.opus` file (lossless copy).
+  * Falls back to high-bitrate AAC (`.m4a`) if Opus is unavailable.
 
 
 * **MP4 mode (Remux vs Direct)**:
-* **Direct**: Tries to download native H.264. This is compatible with ancient players but is often lower quality or larger file size.
-* **Remux**: Downloads the best modern stream (AV1 or VP9) and copies it into an MP4 container. Audio is converted to AAC for compatibility.
-* *Result:* You get the **small file size** and **high quality** of AV1, inside an **MP4 file** that plays on all modern devices.
+  * **Direct**: Tries to download native H.264. This is compatible with ancient players but is often lower quality or larger file size.
+  * **Remux**: Downloads the best modern stream (AV1 or VP9) and copies it into an MP4 container. Audio is converted to AAC for compatibility.
+  * *Result:* You get the **small file size** and **high quality** of AV1, inside an **MP4 file** that plays on all modern devices.
