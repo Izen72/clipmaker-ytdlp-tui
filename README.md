@@ -39,7 +39,7 @@ If you’ve ever needed “only the 00:42:10–00:43:37 moment” from a VOD (an
 
 ### System Tools
 - **ffmpeg** (must be on PATH). Used for high-speed cutting and remuxing.
-  > *Portable install? You can point to it directly with `--ffmpeg-path "C:\path\to\ffmpeg.exe"`.*
+  > *Portable install? You can point to it directly with `--ffmpeg-path "C:\path\to\ffmpeg.exe"` / `--ffmpeg-path "/path/to/ffmpeg"`.*
 
 ### Optional (highly recommended for YouTube)
 - **Node.js** on PATH  

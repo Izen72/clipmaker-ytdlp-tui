@@ -64,8 +64,8 @@ If you want to verify your browser cookies work *outside* the app, run a probe u
 *(Note: We use `uv run` to ensure we use the version installed in your project folder)*
 
 ```bash
-# Example probing Firefox
-uv run yt-dlp -v --cookies-from-browser firefox --print title "[https://www.youtube.com/watch?v=VIDEO_ID](https://www.youtube.com/watch?v=VIDEO_ID)"
+# Example probing Firefox (ensure you're inside your venv)
+uv run yt-dlp -v --cookies-from-browser firefox --print title "https://www.youtube.com/watch?v=VIDEO_ID"
 
 ```
 
@@ -165,6 +165,10 @@ If settings aren't persisting, check permissions on that folder.
 If you have a portable version or don't want to edit your system PATH, use the argument:
 
 ```bash
+# Linux / macOS
+python ytfrags_tui.py --ffmpeg-path "/path/to/ffmpeg"
+
+# Windows
 python ytfrags_tui.py --ffmpeg-path "C:\Path\To\ffmpeg.exe"
 
 ```
