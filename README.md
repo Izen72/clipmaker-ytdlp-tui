@@ -55,14 +55,18 @@ If you’ve ever needed “only the 00:42:10–00:43:37 moment” from a VOD (an
 ## Install
 
 This project uses **uv** for fast, reproducible installs.
+
 <br>
+
 **1. Clone the repo and create a virtual environment**
 ```bash
 git clone https://github.com/Izen72/clipmaker-ytdlp-tui.git
 cd clipmaker-ytdlp-tui
 uv venv
 ```
+
 <br>
+
 **2. Activate the environment:**
 ### Windows:
 ```bash
@@ -76,7 +80,9 @@ source .venv/bin/activate
 ```bash
 source .venv/bin/activate.fish
 ```
+
 <br>
+
 **3. Install dependencies**
 ```bash
 uv pip install -r requirements.txt
