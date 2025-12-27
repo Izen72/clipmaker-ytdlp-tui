@@ -62,6 +62,7 @@ git clone https://github.com/Izen72/clipmaker-ytdlp-tui.git
 cd clipmaker-ytdlp-tui
 uv venv
 ```
+
 **2. Activate the environment:**
 ### Windows:
 ```bash
