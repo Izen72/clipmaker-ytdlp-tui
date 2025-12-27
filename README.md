@@ -51,7 +51,7 @@ If you’ve ever needed “only the 00:42:10–00:43:37 moment” from a VOD (an
 This project uses **uv** for fast, reproducible installs.
 
 ```bash
-git clone https://github.com/Izen72/clipmaker-ytdlp-tui
+git clone https://github.com/Izen72/clipmaker-ytdlp-tui.git
 cd clipmaker-ytdlp-tui
 
 uv venv
