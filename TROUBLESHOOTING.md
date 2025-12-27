@@ -59,11 +59,13 @@ ClipMaker attempts to solve this in stages:
 
 ### Manual confidence test
 
-If you want to verify your browser cookies work *outside* the app, run a quick probe using the installed library or a manual yt-dlp binary if you have one:
+If you want to verify your browser cookies work *outside* the app, run a probe using the installed library.
+
+*(Note: We use `uv run` to ensure we use the version installed in your project folder)*
 
 ```bash
 # Example probing Firefox
-yt-dlp -v --cookies-from-browser firefox --print title "[https://www.youtube.com/watch?v=VIDEO_ID](https://www.youtube.com/watch?v=VIDEO_ID)"
+uv run yt-dlp -v --cookies-from-browser firefox --print title "[https://www.youtube.com/watch?v=VIDEO_ID](https://www.youtube.com/watch?v=VIDEO_ID)"
 
 ```
 
@@ -86,9 +88,10 @@ YouTube streams high-quality Opus audio inside a **WebM** container. Some player
 **ClipMaker (v2.1+) now automatically fixes this.**
 
 * It detects the `.webm` audio file and instantly converts it to a proper **`.opus`** file (without re-encoding/quality loss).
-* If you still see a `.webm` file in your folder, the conversion step likely failed (missing ffmpeg?).
+* If you still see a `.webm` file, the conversion step likely failed (missing ffmpeg?).
 
-You can fix leftovers manually with ffmpeg:
+**Manual fix:**
+You can fix leftovers manually. (If you use a custom ffmpeg path, replace `ffmpeg` with your path).
 
 ```bash
 ffmpeg -i input.webm -vn -c:a copy output.opus

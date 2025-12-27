@@ -39,6 +39,7 @@ If you’ve ever needed “only the 00:42:10–00:43:37 moment” from a VOD (an
 
 ### System Tools
 - **ffmpeg** (must be on PATH). Used for high-speed cutting and remuxing.
+  > *Portable install? You can point to it directly with `--ffmpeg-path "C:\path\to\ffmpeg.exe"`.*
 
 ### Optional (highly recommended for YouTube)
 - **Node.js** on PATH  
@@ -55,7 +56,11 @@ git clone https://github.com/Izen72/clipmaker-ytdlp-tui.git
 cd clipmaker-ytdlp-tui
 
 uv venv
-# (optional) activate the venv in your current shell:
+
+# Activate the environment:
+# Windows:
+#   .venv\Scripts\activate
+# Linux/macOS:
 #   source .venv/bin/activate
 
 uv pip install --upgrade pip wheel setuptools uvloop
