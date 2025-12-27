@@ -79,23 +79,21 @@ yt-dlp -v --cookies-from-browser firefox --print title "[https://www.youtube.com
 
 ### Why it happens
 
-Some sites (YouTube included) deliver high-quality audio streams in a **WebM** container (Opus audio).
-
-Many video players identify this as "Video" because of the container, displaying a black screen during playback.
+YouTube streams high-quality Opus audio inside a **WebM** container. Some players treat this as a "Video" (displaying a black screen).
 
 ### The Fix
 
-This is usually fine (the audio is valid). However, if you strictly need an audio file:
+**ClipMaker (v2.1+) now automatically fixes this.**
 
-* Use **Audio Mode** in ClipMaker.
-* It tries to find native audio containers (like `.m4a` / AAC).
-* If only WebM/Opus exists, you can manually remux it later:
+* It detects the `.webm` audio file and instantly converts it to a proper **`.opus`** file (without re-encoding/quality loss).
+* If you still see a `.webm` file in your folder, the conversion step likely failed (missing ffmpeg?).
+
+You can fix leftovers manually with ffmpeg:
+
 ```bash
-ffmpeg -i input.webm -vn -c:a copy output.ogg
+ffmpeg -i input.webm -vn -c:a copy output.opus
 
 ```
-
-
 
 ---
 
@@ -154,11 +152,19 @@ If settings aren't persisting, check permissions on that folder.
 
 **FFmpeg is mandatory** for cutting and remuxing.
 
-* **Windows**: `winget install ffmpeg` (or add to PATH manually).
+**Option A: Install nicely (Recommended)**
+
+* **Windows**: `winget install ffmpeg` (or add to PATH).
 * **macOS**: `brew install ffmpeg`
 * **Linux**: `sudo apt install ffmpeg`
 
-ClipMaker will refuse to start downloads if `ffmpeg` is not detected on your system PATH.
+**Option B: Point to a specific binary**
+If you have a portable version or don't want to edit your system PATH, use the argument:
+
+```bash
+python ytfrags_tui.py --ffmpeg-path "C:\Path\To\ffmpeg.exe"
+
+```
 
 *(Note: You do NOT need to install `yt-dlp` manually; ClipMaker uses its own internal Python library version.)*
 

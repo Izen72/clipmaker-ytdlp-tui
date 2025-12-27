@@ -17,7 +17,7 @@ If you’ve ever needed “only the 00:42:10–00:43:37 moment” from a VOD (an
     - **MKV (default)**: best video ≤1080p + best audio (prioritizes "God Tier" codecs like AV1/VP9).
     - **MP4**: tries MP4-friendly H.264 + AAC; if unavailable, it auto-falls back to **Remuxing**.
       * *Remux mode downloads the best quality source (AV1/VP9) and wraps it into an MP4 container instantly, preserving original quality and small file size.*
-  - **Audio-only**: downloads **best available audio** (no re-encode). It also tries to prefer *audio-ish* containers (commonly `.m4a`) when the source offers them.
+  - **Audio-only**: downloads **best available audio**. Prioritizes **Opus** (highest efficiency). If it gets a WebM container, it automatically remuxes it to `.opus`. Fallback to AAC/M4A if Opus is missing.
 - **Auth-on-fail** (YouTube etc.)
   - First attempt: **no cookies**
   - If it fails with “sign in / bot wall / captcha / 403 / 429 / cookies” vibes, it automatically retries using browser cookies:
@@ -51,8 +51,8 @@ If you’ve ever needed “only the 00:42:10–00:43:37 moment” from a VOD (an
 This project uses **uv** for fast, reproducible installs.
 
 ```bash
-git clone <REPO_URL>
-cd <REPO_DIR>
+git clone [https://github.com/Izen72/clipmaker-ytdlp-tui](https://github.com/Izen72/clipmaker-ytdlp-tui)
+cd clipmaker-ytdlp-tui
 
 uv venv
 # (optional) activate the venv in your current shell:
@@ -83,7 +83,8 @@ Startup defaults:
 * `--mp4` → default container = MP4 (video-only)
 * `--audio` → default media = audio-only (container ignored)
 * `--remux` → default MP4 method = Remux (prioritizes Quality/Size over legacy H.264)
-* `--zen-profile-path "/path/to/profile-or-cookies.sqlite"` → optional Zen cookie profile override
+* `--zen-profile-path "/path/to/profile"` → optional Zen cookie profile override
+* `--ffmpeg-path "/path/to/custom/ffmpeg"` → override system ffmpeg (default: `ffmpeg`)
 
 Examples:
 
@@ -94,8 +95,8 @@ python ytfrags_tui.py --mp4 --remux
 # Audio mode
 python ytfrags_tui.py --audio
 
-# Point to a specific Zen Browser profile
-python ytfrags_tui.py --zen-profile-path "$HOME/.zen/oplhmacu.Default (release)"
+# Point to a specific Zen Browser profile & custom ffmpeg
+python ytfrags_tui.py --zen-profile-path "$HOME/.zen/oplhmacu.Default (release)" --ffmpeg-path "/opt/ffmpeg/bin/ffmpeg"
 
 ```
 
@@ -163,8 +164,12 @@ If anything acts up (auth, missing formats, audio container weirdness, theme res
 
 ## Notes on quality
 
-* **Audio-only mode** aims for *best audio available* (no conversion).
-“Best” here means the best audio format yt-dlp can fetch according to the selector (often high bitrate AAC in `.m4a`, otherwise Opus-in-WebM, etc.).
+* **Audio-only mode**:
+* Prioritizes **Opus** (the "AV1 of Audio") for maximum quality/size efficiency.
+* If the source is WebM/Opus, it automatically **remuxes** it to a clean `.opus` file (lossless copy).
+* Falls back to high-bitrate AAC (`.m4a`) if Opus is unavailable.
+
+
 * **MP4 mode (Remux vs Direct)**:
 * **Direct**: Tries to download native H.264. This is compatible with ancient players but is often lower quality or larger file size.
 * **Remux**: Downloads the best modern stream (AV1 or VP9) and copies it into an MP4 container. Audio is converted to AAC for compatibility.
