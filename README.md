@@ -47,7 +47,7 @@ or `curl -LsSf https://astral.sh/uv/install.sh | sh`
 *(Note: You may need to restart your terminal after installing uv)*
   
 - **ffmpeg** (must be on PATH). Used for high-speed cutting and remuxing.
-  >> *Portable install? You can point to it directly with `--ffmpeg-path "C:\path\to\ffmpeg.exe"` / `--ffmpeg-path "/path/to/ffmpeg"`.*
+  > *Portable install? You can point to it directly with `--ffmpeg-path "C:\path\to\ffmpeg.exe"` / `--ffmpeg-path "/path/to/ffmpeg"`.*
 
 ### Optional (highly recommended for YouTube)
 - **Node.js** on PATH  
